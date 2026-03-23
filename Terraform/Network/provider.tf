@@ -8,5 +8,5 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-southeast-1" # mumbai
+  region = "ap-south-1" # mumbai
 }
