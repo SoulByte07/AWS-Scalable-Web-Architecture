@@ -1,4 +1,4 @@
-terraform "aws_elastic_load_balancer" "elb" {
+resource "aws_elastic_load_balancer" "elb" {
   name               = "elb"
   availability_zones = ["south-1a", "south-1b", "south-1c"]
 

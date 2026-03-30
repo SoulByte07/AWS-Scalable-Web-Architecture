@@ -1,4 +1,4 @@
-terraform "aws_rdb_instance" "rdb" {
+resource "aws_rdb_instance" "rdb" {
   allocated_storage    = 20
   engine               = "mysql"
   engine_version       = "5.7"
