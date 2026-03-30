@@ -4,6 +4,8 @@ resource "aws_subnet" "public_subnet" {
 
   map_public_ip_on_launch = true 
 
+  availability_zone = ["ap-south-1a", "ap-south-1b"][count.index]
+
   tags = {
     Name = "Public Subnet"
   }
