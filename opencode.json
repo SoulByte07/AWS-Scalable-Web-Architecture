@@ -1,0 +1,12 @@
+{
+  "mcp": {
+    "infracost": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@infracost/mcp-server"
+      ]
+    }
+  }
+}
