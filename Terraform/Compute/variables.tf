@@ -13,8 +13,8 @@ variable "alb_security_group_id" {
   type        = string
 }
 
-variable "alb_arn" {
-  description = "The ARN of the Application Load Balancer"
-  type        = string
+variable "public_subnets" { 
+  type = list(string) 
 }
+
 
