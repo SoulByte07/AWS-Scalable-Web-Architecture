@@ -2,7 +2,7 @@ resource "aws_autoscaling_group" "auto_scaling_group" {
   max_size = 5
   min_size = 2 
   health_check_grace_period = 300
-  health_check_type         = "elb"
+  health_check_type         = "alb"
   desired_capacity          = 4
   force_delete              = true
   launch_configuration      = aws_launch_configuration.foobar.name
