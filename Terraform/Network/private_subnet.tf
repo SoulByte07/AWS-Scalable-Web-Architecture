@@ -1,13 +1,15 @@
+# Network/private_subnet.tf
 resource "aws_subnet" "private_subnet" {
+  count             = length(var.availability_zones)
   vpc_id            = aws_vpc.main_vpc.id
-  cidr_block        = "10.0.2.0/24"
+  
+  # Generates 10.0.3.0/24 and 10.0.4.0/24
+  cidr_block        = "10.0.${count.index + 3}.0/24" 
+  availability_zone = var.availability_zones[count.index]
 
   map_public_ip_on_launch = false
 
-  availability_zone = ["ap-south-1a", "ap-south-1b"][count.index]
-
-
   tags = {
-    Name = "Private Subnet"
+    Name = "Private Subnet ${var.availability_zones[count.index]}"
   }
 }
