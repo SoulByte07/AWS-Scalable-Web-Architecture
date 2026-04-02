@@ -48,3 +48,17 @@ resource "aws_autoscaling_group" "vocal4local_asg" {
   }
 }
 
+resource "aws_autoscaling_policy" "cpu_tracking_policy" {
+  name                   = "vocal4local-cpu-policy"
+  policy_type            = "TargetTrackingScaling"
+  autoscaling_group_name = aws_autoscaling_group.vocal4local_asg.name
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    # Scale up if average CPU hits 70% across instances
+    target_value = 70.0 
+  }
+}
+
