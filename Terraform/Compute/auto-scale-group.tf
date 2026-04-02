@@ -20,18 +20,33 @@ resource "aws_security_group" "app_sg" {
 
 resource "aws_launch_template" "vocal4local_lt" {
   name_prefix   = "vocal4local-template-"
-  image_id      = var.ami_id
+  image_id      = var.ami.id
   instance_type = var.instance_type
-
   vpc_security_group_ids = [aws_security_group.app_sg.id]
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name = "Vocal4Local-App-Server"
-    }
-  }
+  # Inject a startup script to build a dummy webpage
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    # Update packages and install Apache web server
+    yum update -y
+    yum install -y httpd
+    systemctl start httpd
+    systemctl enable httpd
+    
+    # Fetch the server's private IP dynamically using AWS metadata
+    TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+    LOCAL_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4)
+    
+    # Create the HTML landing page
+    echo "<div style='text-align:center; margin-top:50px; font-family:sans-serif;'>" > /var/www/html/index.html
+    echo "<h1>🛍️ Vocal4Local Simulation</h1>" >> /var/www/html/index.html
+    echo "<h3>Infrastructure is LIVE!</h3>" >> /var/www/html/index.html
+    echo "<p>Serving traffic from instance: <b style='color:green;'>$LOCAL_IP</b></p>" >> /var/www/html/index.html
+    echo "</div>" >> /var/www/html/index.html
+  EOF
+  )
 }
+
 
 resource "aws_autoscaling_group" "vocal4local_asg" {
   name                = "vocal4local-asg"
