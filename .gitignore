@@ -1,0 +1,51 @@
+# ==========================================
+# 1. Environment & Secrets (High Priority)
+# ==========================================
+# Ignore all .env files and folders recursively
+**/.env/
+**/.env
+**/.env.*
+**/*.decrypted
+**/*.plain
+envVault.sh
+sops-edit-*
+
+# ==========================================
+# 2. Terraform & Infrastructure
+# ==========================================
+# Local .terraform directories (re-downloadable)
+**/.terraform/
+**/.terraform.*
+# State files (contain secrets)
+**/*.tfstate
+**/*.tfstate.*
+# Variable files
+**/*.tfvars
+**/*.tfvars.json
+# Overrides
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
+# CLI Config
+.terraformrc
+terraform.rc
+
+# ==========================================
+# 3. Tooling, Cache & OS (Arch/Linux specific)
+# ==========================================
+**/.cache/
+**/.config/
+**/.local/
+**/.npm/
+**/node_modules/
+**/crash.log
+# Backup files from draw.io or editors
+**/*.bkp
+**/*.tmp
+
+# ==========================================
+# 4. Project Specific "Oddities"
+# ==========================================
+# That weird file/folder in your tree
+--exclude
