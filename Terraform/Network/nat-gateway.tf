@@ -10,7 +10,7 @@ resource "aws_eip" "vocal4local_nat_eip" {
 # 2. Create the NAT Gateway in the Public Subnet
 resource "aws_nat_gateway" "vocal4local_nat" {
   allocation_id = aws_eip.vocal4local_nat_eip.id
-  subnet_id     = var.public_subnet_az1 
+  subnet_id     = aws_subnet.public_az1.id
 
   tags = {
     Name = "Vocal4Local Primary NAT"
