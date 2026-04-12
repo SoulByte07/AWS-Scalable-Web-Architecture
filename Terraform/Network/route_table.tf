@@ -1,5 +1,5 @@
 resource "aws_route_table" "main_rt" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.main_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"

@@ -1,5 +1,5 @@
 resource "aws_route_table_association" "public_subnet_association" {
-  subnet_id      = aws_subnet.private_az1.id
+  subnet_id      = aws_subnet.private_subnet.id
   route_table_id = aws_route_table.main_rt.id
   availability_zone = ["ap-south-1a", "ap-south-1b"][count.index]
 }
