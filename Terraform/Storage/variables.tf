@@ -7,4 +7,3 @@ variable "db_security_group_id" {
   description = "The Security Group ID for the RDS instance"
   type        = string
 }
-
