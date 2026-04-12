@@ -19,9 +19,9 @@ resource "aws_security_group" "app_sg" {
 }
 
 resource "aws_launch_template" "vocal4local_lt" {
-  name_prefix   = "vocal4local-template-"
-  image_id      = var.ami_id
-  instance_type = var.instance_type
+  name_prefix            = "vocal4local-template-"
+  image_id               = var.ami_id
+  instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.app_sg.id]
 
   # Inject a startup script to build a dummy webpage
@@ -50,7 +50,7 @@ resource "aws_launch_template" "vocal4local_lt" {
 
 resource "aws_autoscaling_group" "vocal4local_asg" {
   name                = "vocal4local-asg"
-  vpc_zone_identifier = var.private_subnet_ids # Spans across Multi-AZ private subnets
+  vpc_zone_identifier = var.private_subnet_ids                   # Spans across Multi-AZ private subnets
   target_group_arns   = [aws_lb_target_group.vocal4local_tg.arn] # Connects to ALB
 
   desired_capacity = 2
@@ -73,7 +73,7 @@ resource "aws_autoscaling_policy" "cpu_tracking_policy" {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
     # Scale up if average CPU hits 70% across instances
-    target_value = 70.0 
+    target_value = 70.0
   }
 }
 

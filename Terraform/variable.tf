@@ -5,10 +5,10 @@ variable "availability_zones" {
   default     = ["ap-south-1a", "ap-south-1b"]
 }
 
-variable "instance_type" { 
+variable "instance_type" {
   type    = string
   default = "t2.micro"
-} 
+}
 
 variable "ami_id" {
   type    = string
@@ -32,8 +32,8 @@ variable "alb_security_group_id" {
   type        = string
 }
 
-variable "public_subnets_ids" { 
-  type = list(string) 
+variable "public_subnet_ids" {
+  type = list(string)
 }
 
 variable "aws_ami" {

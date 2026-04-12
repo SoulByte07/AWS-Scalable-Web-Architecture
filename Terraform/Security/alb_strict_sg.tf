@@ -4,11 +4,11 @@ resource "aws_security_group" "alb_strict_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
     # AWS Managed Prefix List for CloudFront (Global)
-    prefix_list_ids = ["pl-3b927c52"] 
+    prefix_list_ids = ["pl-3b927c52"]
   }
 
   egress {

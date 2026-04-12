@@ -10,7 +10,7 @@ resource "aws_eip" "vocal4local_nat_eip" {
 # 2. Create the NAT Gateway in the Public Subnet
 resource "aws_nat_gateway" "vocal4local_nat" {
   allocation_id = aws_eip.vocal4local_nat_eip.id
-  subnet_id     = aws_subnet.public_subnet[count.index]
+  subnet_id     = aws_subnet.public_subnet[0].id
 
   tags = {
     Name = "Vocal4Local Primary NAT"
@@ -18,12 +18,12 @@ resource "aws_nat_gateway" "vocal4local_nat" {
 
   # Ensure the Internet Gateway is created before the NAT Gateway
   # Replace 'aws_internet_gateway.your_existing_igw' with your actual IGW resource name
-  depends_on = [aws_internet_gateway.igw] 
+  depends_on = [aws_internet_gateway.igw]
 }
 
 # 3. Create a Route Table for your Private Subnets
 resource "aws_route_table" "vocal4local_private_rt" {
-  vpc_id = var.vpc_id
+  vpc_id = aws_vpc.main_vpc.id
 
   # Send all outside traffic to the NAT Gateway
   route {
@@ -38,7 +38,7 @@ resource "aws_route_table" "vocal4local_private_rt" {
 
 # 4. Associate the Route Table with your Private Subnets
 resource "aws_route_table_association" "private_az1_assoc" {
-  subnet_id      = var.private_subnet_az1
+  count          = length(aws_subnet.private_subnet)
+  subnet_id      = aws_subnet.private_subnet[count.index].id
   route_table_id = aws_route_table.vocal4local_private_rt.id
 }
-
