@@ -7,6 +7,12 @@ resource "aws_lb" "alb" {
 
   subnets = var.public_subnets
 
+  access_logs {
+    bucket  = aws_s3_bucket.alb_logs.id
+    prefix  = "AWSLogs"
+    enabled = true
+  }
+
   enable_deletion_protection = false
 
   tags = {
