@@ -27,6 +27,11 @@ variable "public_subnets" {
   type = list(string)
 }
 
+variable "alb_acm_certificate_arn" {
+  description = "ACM certificate ARN for the ALB HTTPS listener"
+  type        = string
+}
+
 variable "aws_ami" {
   type    = string
   default = "ami-0c55b159cbfafe1f0" # Amazon Linux 2 Mumbai
