@@ -1,20 +1,4 @@
-resource "random_password" "db_password" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
-resource "aws_secretsmanager_secret" "db_secret_vault" {
-  name        = "vocal4local-prod-db-credentials"
-  description = "Master password for the Vocal4Local RDS instance"
-}
-
-resource "aws_secretsmanager_secret_version" "db_secret_version" {
-  secret_id     = aws_secretsmanager_secret.db_secret_vault.id
-  secret_string = random_password.db_password.result
-}
-
-
+# Provide your private subnets via variables
 resource "aws_db_subnet_group" "vocal4local_db_group" {
   name       = "vocal4local-db-subnet-group"
   subnet_ids = var.private_db_subnets
@@ -24,6 +8,7 @@ resource "aws_db_subnet_group" "vocal4local_db_group" {
   }
 }
 
+# The Secure RDS Instance
 resource "aws_db_instance" "vocal4local_database" {
   identifier        = "vocal4local-prod-db"
   allocated_storage = 20
@@ -33,15 +18,19 @@ resource "aws_db_instance" "vocal4local_database" {
   instance_class    = "db.t3.micro"
 
   multi_az = true
-
   db_name  = "vocal4local"
   username = "admin"
-  password = random_password.db_password.result
+
+  # SECURITY FIX 1: Let AWS manage, generate, and store the password in Secrets Manager
+  manage_master_user_password = true
+  
+  # SECURITY FIX 2: Encrypt the storage at rest
+  storage_encrypted = true
 
   db_subnet_group_name   = aws_db_subnet_group.vocal4local_db_group.name
   vpc_security_group_ids = [var.db_security_group_id]
 
-  # TODO: Skip final snapshot for dev/testing to speed up destruction. Set to false for true Prod!
+  # Keeping this true for your dev/testing, but definitely flip to false for true Prod!
   skip_final_snapshot = true
 
   tags = {
@@ -50,3 +39,8 @@ resource "aws_db_instance" "vocal4local_database" {
   }
 }
 
+# Output the ARN of the automatically generated secret so your application can fetch it
+output "db_secret_arn" {
+  description = "The ARN of the Secrets Manager secret containing the DB credentials"
+  value       = aws_db_instance.vocal4local_database.master_user_secret[0].secret_arn
+}
