@@ -23,15 +23,20 @@ resource "aws_db_instance" "vocal4local_database" {
 
   # SECURITY FIX 1: Let AWS manage, generate, and store the password in Secrets Manager
   manage_master_user_password = true
-  
+
   # SECURITY FIX 2: Encrypt the storage at rest
   storage_encrypted = true
+
+  backup_retention_period = 7
+  backup_window           = "03:00-04:00"
+  deletion_protection     = true
+  publicly_accessible     = false
 
   db_subnet_group_name   = aws_db_subnet_group.vocal4local_db_group.name
   vpc_security_group_ids = [var.db_security_group_id]
 
-  # Keeping this true for your dev/testing, but definitely flip to false for true Prod!
-  skip_final_snapshot = true
+  skip_final_snapshot       = false
+  final_snapshot_identifier = "vocal4local-final-snapshot"
 
   tags = {
     Environment = "production"
