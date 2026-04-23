@@ -24,6 +24,21 @@ resource "aws_launch_template" "vocal4local_lt" {
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.app_sg.id]
 
+  metadata_options {
+    http_tokens = "required"
+  }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      encrypted             = true
+      volume_size           = 20
+      volume_type           = "gp3"
+      delete_on_termination = true
+    }
+  }
+
   # Inject a startup script to build a dummy webpage
   user_data = base64encode(<<-EOF
     #!/bin/bash
@@ -76,4 +91,3 @@ resource "aws_autoscaling_policy" "cpu_tracking_policy" {
     target_value = 70.0
   }
 }
-
