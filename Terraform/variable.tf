@@ -15,6 +15,11 @@ variable "ami_id" {
   default = "ami-0c94855ba95c71c99"
 }
 
+variable "alb_acm_certificate_arn" {
+  description = "ACM certificate ARN for the ALB HTTPS listener"
+  type        = string
+}
+
 
 # Compute
 variable "vpc_id" {
