@@ -11,6 +11,7 @@ data "aws_iam_policy_document" "ec2_assume_role" {
   }
 }
 
+# Instance role grants Session Manager access and CloudWatch agent permissions.
 resource "aws_iam_role" "ec2_ssm_cloudwatch" {
   name               = "vocal4local-ec2-ssm-cloudwatch-role"
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json

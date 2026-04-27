@@ -56,10 +56,10 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
   }
 
   default_cache_behavior {
-    allowed_methods            = ["GET", "HEAD"]
-    cached_methods             = ["GET", "HEAD"]
-    target_origin_id           = "S3-Vocal4Local-Frontend"
-    viewer_protocol_policy     = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "S3-Vocal4Local-Frontend"
+    viewer_protocol_policy = "redirect-to-https"
     # AWS managed Security Headers policy (adds HSTS, X-Content-Type-Options, etc).
     response_headers_policy_id = "67f7725c-6f97-4210-82d7-5512b31e9d03"
 
@@ -84,7 +84,7 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
     acm_certificate_arn            = var.enable_custom_domain ? var.cloudfront_acm_certificate_arn : null
     ssl_support_method             = var.enable_custom_domain ? "sni-only" : null
     # Enforce modern TLS even when using default CloudFront cert.
-    minimum_protocol_version       = "TLSv1.2_2021"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 }
 

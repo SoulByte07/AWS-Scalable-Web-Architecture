@@ -1,3 +1,4 @@
+# Dedicated S3 bucket for ALB access logs.
 resource "aws_s3_bucket" "alb_logs" {
   bucket = "${var.bucket_name_prefix}-alb-access-logs-${data.aws_caller_identity.current.account_id}"
 
@@ -47,6 +48,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "alb_logs" {
     }
 
     expiration {
+      # Keep logs for learning/audit, then expire to control storage cost.
       days = 180
     }
   }
