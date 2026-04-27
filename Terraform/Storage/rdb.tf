@@ -12,7 +12,7 @@ resource "aws_db_subnet_group" "vocal4local_db_group" {
 resource "aws_db_instance" "vocal4local_database" {
   identifier        = "vocal4local-prod-db"
   allocated_storage = 20
-  storage_type      = "gp2"
+  storage_type      = "gp3"
   engine            = "mysql"
   engine_version    = "8.0"
   instance_class    = "db.t3.micro"
