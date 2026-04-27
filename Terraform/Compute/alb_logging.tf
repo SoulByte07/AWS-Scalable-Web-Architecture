@@ -1,10 +1,12 @@
 resource "aws_s3_bucket" "alb_logs" {
-  bucket = "vocal4local-alb-access-logs"
+  bucket = "${var.bucket_name_prefix}-alb-access-logs-${data.aws_caller_identity.current.account_id}"
 
   tags = {
     Name = "Vocal4Local ALB Access Logs"
   }
 }
+
+data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket_public_access_block" "alb_logs" {
   bucket = aws_s3_bucket.alb_logs.id
