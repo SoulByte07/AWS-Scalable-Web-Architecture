@@ -30,6 +30,7 @@ sops-edit-*
 # CLI Config
 .terraformrc
 terraform.rc
+**/.tfplan
 
 # ==========================================
 # 3. Tooling, Cache & OS (Arch/Linux specific)
