@@ -20,9 +20,13 @@ resource "aws_security_group" "app_sg" {
 
 resource "aws_launch_template" "vocal4local_lt" {
   name_prefix            = "vocal4local-template-"
-  image_id               = var.ami_id
+  image_id               = local.selected_ami_id
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.app_sg.id]
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_profile.name
+  }
 
   metadata_options {
     http_tokens = "required"
@@ -68,9 +72,11 @@ resource "aws_autoscaling_group" "vocal4local_asg" {
   vpc_zone_identifier = var.private_subnet_ids                   # Spans across Multi-AZ private subnets
   target_group_arns   = [aws_lb_target_group.vocal4local_tg.arn] # Connects to ALB
 
-  desired_capacity = 2
-  min_size         = 2
-  max_size         = 4
+  desired_capacity          = 2
+  min_size                  = 2
+  max_size                  = 4
+  health_check_type         = "ELB"
+  health_check_grace_period = 300
 
   launch_template {
     id      = aws_launch_template.vocal4local_lt.id
