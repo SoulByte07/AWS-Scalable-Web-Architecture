@@ -10,11 +10,31 @@ resource "aws_security_group" "app_sg" {
     security_groups = [var.alb_security_group_id] # Strict link to ALB!
   }
 
+  # Keep outbound scope minimal for learning:
+  # - HTTPS for package updates and AWS APIs
+  # - DNS to VPC resolver for name resolution
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"] # Outbound via NAT Gateway
+    description = "Allow HTTPS outbound"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow DNS UDP to VPC resolver"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
+  egress {
+    description = "Allow DNS TCP to VPC resolver"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
   }
 }
 
@@ -29,6 +49,7 @@ resource "aws_launch_template" "vocal4local_lt" {
   }
 
   metadata_options {
+    # Require IMDSv2 to reduce metadata service abuse risk.
     http_tokens = "required"
   }
 
@@ -43,7 +64,7 @@ resource "aws_launch_template" "vocal4local_lt" {
     }
   }
 
-  # Inject a startup script to build a dummy webpage
+  # Bootstraps a basic Apache page that shows the instance private IP.
   user_data = base64encode(<<-EOF
     #!/bin/bash
     # Update packages and install Apache web server

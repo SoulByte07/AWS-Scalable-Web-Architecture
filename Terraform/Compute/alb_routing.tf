@@ -14,26 +14,44 @@ resource "aws_lb_target_group" "vocal4local_tg" {
   }
 }
 
-resource "aws_lb_listener" "http_listener" {
+# When HTTPS is enabled, keep port 80 open only to redirect traffic to 443.
+resource "aws_lb_listener" "http_redirect_listener" {
+  count             = var.enable_alb_https ? 1 : 0
   load_balancer_arn = aws_lb.alb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    type             = var.enable_alb_https ? "redirect" : "forward"
-    target_group_arn = var.enable_alb_https ? null : aws_lb_target_group.vocal4local_tg.arn
+    type = "redirect"
 
-    dynamic "redirect" {
-      for_each = var.enable_alb_https ? [1] : []
-      content {
-        port        = "443"
-        protocol    = "HTTPS"
-        status_code = "HTTP_301"
-      }
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
     }
   }
 }
 
+# When HTTPS is disabled, do not forward plaintext traffic to the app tier.
+# This makes the fallback mode explicit for learning and avoids silent insecure defaults.
+resource "aws_lb_listener" "http_block_listener" {
+  count             = var.enable_alb_https ? 0 : 1
+  load_balancer_arn = aws_lb.alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "HTTPS is required. Set enable_alb_https=true and provide alb_acm_certificate_arn."
+      status_code  = "403"
+    }
+  }
+}
+
+# Main TLS listener for production-style traffic.
 resource "aws_lb_listener" "https_listener" {
   count             = var.enable_alb_https ? 1 : 0
   load_balancer_arn = aws_lb.alb.arn

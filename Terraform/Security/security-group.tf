@@ -11,15 +11,12 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
+# DB SG intentionally has no broad egress rules.
+# Ingress for MySQL from app SG is defined in root `database_sg_rule.tf`.
 resource "aws_security_group" "db_sg" {
   name        = "vocal4local-db-sg"
   description = "Allow MySQL from inside VPC"
   vpc_id      = var.vpc_id
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  egress = []
 }

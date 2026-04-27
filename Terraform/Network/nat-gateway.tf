@@ -1,3 +1,4 @@
+# One EIP + NAT gateway per AZ for HA private egress.
 resource "aws_eip" "nat_eip" {
   count = length(var.availability_zones)
 
@@ -21,6 +22,7 @@ resource "aws_nat_gateway" "nat" {
   depends_on = [aws_internet_gateway.igw]
 }
 
+# Private route tables send default traffic through NAT, not IGW.
 resource "aws_route_table" "private_rt" {
   count = length(var.availability_zones)
 

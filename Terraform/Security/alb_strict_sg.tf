@@ -1,3 +1,4 @@
+# ALB SG: allow web entry from internet, and only app-port egress into VPC.
 resource "aws_security_group" "alb_strict_sg" {
   name        = "vocal4local-alb-strict-sg"
   description = "Allow inbound web traffic to ALB"

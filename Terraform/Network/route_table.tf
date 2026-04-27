@@ -1,3 +1,4 @@
+# Public route table: default route to internet gateway.
 resource "aws_route_table" "main_rt" {
   vpc_id = aws_vpc.main_vpc.id
 

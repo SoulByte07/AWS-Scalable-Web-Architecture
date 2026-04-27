@@ -4,6 +4,7 @@ variable "alb_acm_certificate_arn" {
   default     = null
 
   validation {
+    # Only required when HTTPS listener is turned on.
     condition     = !var.enable_alb_https || var.alb_acm_certificate_arn != null
     error_message = "Set alb_acm_certificate_arn when enable_alb_https is true."
   }
@@ -27,6 +28,7 @@ variable "root_domain_name" {
   default     = null
 
   validation {
+    # Domain inputs are required only when custom domain support is enabled.
     condition     = !var.enable_custom_domain || var.root_domain_name != null
     error_message = "Set root_domain_name when enable_custom_domain is true."
   }
@@ -49,6 +51,7 @@ variable "cloudfront_acm_certificate_arn" {
   default     = null
 
   validation {
+    # Must be an ACM cert from us-east-1 for CloudFront custom domains.
     condition     = !var.enable_custom_domain || var.cloudfront_acm_certificate_arn != null
     error_message = "Set cloudfront_acm_certificate_arn when enable_custom_domain is true."
   }

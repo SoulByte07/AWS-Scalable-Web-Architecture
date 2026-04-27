@@ -1,3 +1,4 @@
+# Explicit cross-module rule: app tier -> database tier on MySQL only.
 resource "aws_vpc_security_group_ingress_rule" "db_from_app" {
   security_group_id            = module.security.db_sg_id
   referenced_security_group_id = module.compute.app_sg_id

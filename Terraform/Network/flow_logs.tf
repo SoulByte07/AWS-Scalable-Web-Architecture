@@ -1,3 +1,4 @@
+# VPC flow logs capture accepted/rejected traffic for troubleshooting and learning.
 resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
   name              = "/aws/vpc/vocal4local-flow-logs"
   retention_in_days = 30

@@ -6,6 +6,7 @@ resource "aws_s3_bucket" "vocal4local_frontend" {
   }
 }
 
+# Block all forms of accidental public S3 access.
 resource "aws_s3_bucket_public_access_block" "vocal4local_frontend" {
   bucket = aws_s3_bucket.vocal4local_frontend.id
 
@@ -15,6 +16,7 @@ resource "aws_s3_bucket_public_access_block" "vocal4local_frontend" {
   restrict_public_buckets = true
 }
 
+# Encrypt static assets at rest in S3.
 resource "aws_s3_bucket_server_side_encryption_configuration" "vocal4local_frontend" {
   bucket = aws_s3_bucket.vocal4local_frontend.id
 
@@ -33,6 +35,7 @@ resource "aws_s3_bucket_ownership_controls" "vocal4local_frontend" {
   }
 }
 
+# OAC signs CloudFront -> S3 requests so bucket can stay private.
 resource "aws_cloudfront_origin_access_control" "vocal4local_oac" {
   name                              = "vocal4local-s3-oac"
   origin_access_control_origin_type = "s3"
@@ -45,7 +48,7 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
   default_root_object = "index.html"
   web_acl_id          = aws_wafv2_web_acl.cloudfront_acl.arn
 
-  # Point to the S3 bucket
+  # Private S3 origin fronted by CloudFront.
   origin {
     domain_name              = aws_s3_bucket.vocal4local_frontend.bucket_regional_domain_name
     origin_id                = "S3-Vocal4Local-Frontend"
@@ -57,6 +60,7 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
     cached_methods             = ["GET", "HEAD"]
     target_origin_id           = "S3-Vocal4Local-Frontend"
     viewer_protocol_policy     = "redirect-to-https"
+    # AWS managed Security Headers policy (adds HSTS, X-Content-Type-Options, etc).
     response_headers_policy_id = "67f7725c-6f97-4210-82d7-5512b31e9d03"
 
     forwarded_values {
@@ -79,6 +83,7 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
     cloudfront_default_certificate = !var.enable_custom_domain
     acm_certificate_arn            = var.enable_custom_domain ? var.cloudfront_acm_certificate_arn : null
     ssl_support_method             = var.enable_custom_domain ? "sni-only" : null
+    # Enforce modern TLS even when using default CloudFront cert.
     minimum_protocol_version       = "TLSv1.2_2021"
   }
 }
@@ -86,6 +91,7 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "vocal4local_frontend_policy" {
+  # Deny any plaintext (non-TLS) requests to the bucket.
   statement {
     sid    = "DenyInsecureTransport"
     effect = "Deny"
@@ -109,6 +115,7 @@ data "aws_iam_policy_document" "vocal4local_frontend_policy" {
     }
   }
 
+  # Allow object reads only from this CloudFront distribution.
   statement {
     sid    = "AllowCloudFrontReadOnly"
     effect = "Allow"
@@ -151,6 +158,7 @@ resource "aws_wafv2_web_acl" "cloudfront_acl" {
     sampled_requests_enabled   = true
   }
 
+  # Baseline managed protection against common exploits.
   rule {
     name     = "AWSManagedRulesCommonRuleSet"
     priority = 1
@@ -173,6 +181,7 @@ resource "aws_wafv2_web_acl" "cloudfront_acl" {
     }
   }
 
+  # Blocks requests from AWS-known malicious IP sources.
   rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
     priority = 2
@@ -195,6 +204,7 @@ resource "aws_wafv2_web_acl" "cloudfront_acl" {
     }
   }
 
+  # Basic per-IP rate limiting to reduce abuse spikes.
   rule {
     name     = "AWSManagedRulesAmazonIpReputationList"
     priority = 3
@@ -240,6 +250,7 @@ resource "aws_wafv2_web_acl" "cloudfront_acl" {
   }
 }
 
+# WAF logs for analysis and rule tuning.
 resource "aws_cloudwatch_log_group" "cloudfront_waf" {
   provider = aws.us_east_1
 

@@ -1,7 +1,9 @@
+# Central SNS topic for operational alarms.
 resource "aws_sns_topic" "ops_alerts" {
   name = "vocal4local-ops-alerts"
 }
 
+# Optional email subscription (requires email confirmation in AWS).
 resource "aws_sns_topic_subscription" "ops_alerts_email" {
   count = var.ops_alert_email != null ? 1 : 0
 

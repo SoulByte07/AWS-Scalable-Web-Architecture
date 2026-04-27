@@ -1,14 +1,21 @@
-# Description: The master file that calls all sub-modules and passes data between them.
+# Root composition for the full architecture.
+#
+# Data flow (high level):
+# network -> security/compute/database
+# security -> compute/database
+# edge -> dns (when custom domain is enabled)
 
 module "networking" {
   source = "./Network"
 }
 
+# Security groups depend on VPC creation from networking.
 module "security" {
   source = "./Security"
   vpc_id = module.networking.vpc_id
 }
 
+# Compute layer uses both networking outputs and security group IDs.
 module "compute" {
   source                  = "./Compute"
   vpc_id                  = module.networking.vpc_id
@@ -21,12 +28,15 @@ module "compute" {
   bucket_name_prefix      = var.bucket_name_prefix
 }
 
+# Database runs in private subnets and is reachable only from app SG.
 module "database" {
   source               = "./Storage"
   private_db_subnets   = module.networking.private_subnet_ids
   db_security_group_id = module.security.db_sg_id
 }
 
+# Edge layer hosts static frontend in S3 + CloudFront (+ WAF).
+# CloudFront uses us-east-1 for WAF and ACM compatibility.
 module "edge" {
   source = "./Edge"
 

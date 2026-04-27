@@ -1,3 +1,4 @@
+# SG attached to interface endpoints so private subnets can reach AWS APIs over 443.
 resource "aws_security_group" "vpce_sg" {
   name        = "vocal4local-vpce-sg"
   description = "Allow HTTPS from app subnets to VPC interface endpoints"
@@ -19,6 +20,7 @@ resource "aws_security_group" "vpce_sg" {
   }
 }
 
+# Gateway endpoint keeps S3 traffic private and reduces NAT dependency.
 resource "aws_vpc_endpoint" "s3_gateway" {
   vpc_id            = aws_vpc.main_vpc.id
   service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
@@ -30,6 +32,8 @@ resource "aws_vpc_endpoint" "s3_gateway" {
   }
 }
 
+# Interface endpoints for SSM Session Manager and CloudWatch Logs.
+# These let private EC2 instances stay manageable without direct internet ingress.
 resource "aws_vpc_endpoint" "ssm" {
   vpc_id              = aws_vpc.main_vpc.id
   service_name        = "com.amazonaws.${data.aws_region.current.name}.ssm"
