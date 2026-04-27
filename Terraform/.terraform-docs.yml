@@ -1,0 +1,20 @@
+
+formatter: "markdown table"
+
+header-from: main.tf
+footer-from: ""
+
+sections:
+  show:
+    - header
+    - providers
+    - inputs
+    - outputs
+
+sort:
+  enabled: true
+  by: name
+
+settings:
+  indent: 2
+
