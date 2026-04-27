@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "vocal4local_frontend" {
-  bucket = "vocal4local-frontend-assets"
+  bucket = "${var.bucket_name_prefix}-frontend-assets-${data.aws_caller_identity.current.account_id}"
 
   tags = {
     Name = "Vocal4Local Frontend"
@@ -72,10 +72,16 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
     }
   }
 
+  aliases = [var.frontend_domain_name]
+
   viewer_certificate {
-    cloudfront_default_certificate = true # TODO :We will upgrade to ACM later
+    acm_certificate_arn      = var.cloudfront_acm_certificate_arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 }
+
+data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "vocal4local_frontend_policy" {
   statement {
