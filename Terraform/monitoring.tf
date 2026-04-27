@@ -2,6 +2,14 @@ resource "aws_sns_topic" "ops_alerts" {
   name = "vocal4local-ops-alerts"
 }
 
+resource "aws_sns_topic_subscription" "ops_alerts_email" {
+  count = var.ops_alert_email != null ? 1 : 0
+
+  topic_arn = aws_sns_topic.ops_alerts.arn
+  protocol  = "email"
+  endpoint  = var.ops_alert_email
+}
+
 resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
   alarm_name          = "vocal4local-alb-5xx"
   comparison_operator = "GreaterThanThreshold"
