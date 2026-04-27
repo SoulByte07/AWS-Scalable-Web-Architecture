@@ -59,3 +59,9 @@ variable "enable_custom_domain" {
   type        = bool
   default     = false
 }
+
+variable "ops_alert_email" {
+  description = "Optional email endpoint for operational alerts"
+  type        = string
+  default     = null
+}
