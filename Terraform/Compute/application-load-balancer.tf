@@ -13,7 +13,7 @@ resource "aws_lb" "alb" {
     enabled = true
   }
 
-  enable_deletion_protection = false
+  enable_deletion_protection = true
 
   tags = {
     Environment = "production"
