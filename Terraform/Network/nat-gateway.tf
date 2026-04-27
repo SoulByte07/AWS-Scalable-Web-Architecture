@@ -1,44 +1,44 @@
-# 1. Allocate a static Public IP for the NAT Gateway
-resource "aws_eip" "vocal4local_nat_eip" {
+resource "aws_eip" "nat_eip" {
+  count = length(var.availability_zones)
+
   domain = "vpc"
 
   tags = {
-    Name = "Vocal4Local NAT EIP"
+    Name = "vocal4local-nat-eip-${count.index + 1}"
   }
 }
 
-# 2. Create the NAT Gateway in the Public Subnet
-resource "aws_nat_gateway" "vocal4local_nat" {
-  allocation_id = aws_eip.vocal4local_nat_eip.id
-  subnet_id     = aws_subnet.public_subnet[0].id
+resource "aws_nat_gateway" "nat" {
+  count = length(var.availability_zones)
+
+  allocation_id = aws_eip.nat_eip[count.index].id
+  subnet_id     = aws_subnet.public_subnet[count.index].id
 
   tags = {
-    Name = "Vocal4Local Primary NAT"
+    Name = "vocal4local-nat-${count.index + 1}"
   }
 
-  # Ensure the Internet Gateway is created before the NAT Gateway
-  # Replace 'aws_internet_gateway.your_existing_igw' with your actual IGW resource name
   depends_on = [aws_internet_gateway.igw]
 }
 
-# 3. Create a Route Table for your Private Subnets
-resource "aws_route_table" "vocal4local_private_rt" {
+resource "aws_route_table" "private_rt" {
+  count = length(var.availability_zones)
+
   vpc_id = aws_vpc.main_vpc.id
 
-  # Send all outside traffic to the NAT Gateway
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.vocal4local_nat.id
+    nat_gateway_id = aws_nat_gateway.nat[count.index].id
   }
 
   tags = {
-    Name = "Vocal4Local Private Route Table"
+    Name = "vocal4local-private-rt-${count.index + 1}"
   }
 }
 
-# 4. Associate the Route Table with your Private Subnets
-resource "aws_route_table_association" "private_az1_assoc" {
-  count          = length(aws_subnet.private_subnet)
+resource "aws_route_table_association" "private_subnet_association" {
+  count = length(var.availability_zones)
+
   subnet_id      = aws_subnet.private_subnet[count.index].id
-  route_table_id = aws_route_table.vocal4local_private_rt.id
+  route_table_id = aws_route_table.private_rt[count.index].id
 }
