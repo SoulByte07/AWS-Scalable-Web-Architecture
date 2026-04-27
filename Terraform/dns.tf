@@ -1,10 +1,14 @@
 data "aws_route53_zone" "primary" {
+  count = var.enable_custom_domain ? 1 : 0
+
   name         = var.root_domain_name
   private_zone = false
 }
 
 resource "aws_route53_record" "frontend_alias" {
-  zone_id = data.aws_route53_zone.primary.zone_id
+  count = var.enable_custom_domain ? 1 : 0
+
+  zone_id = data.aws_route53_zone.primary[0].zone_id
   name    = var.frontend_domain_name
   type    = "A"
 

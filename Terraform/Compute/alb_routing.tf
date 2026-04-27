@@ -14,23 +14,28 @@ resource "aws_lb_target_group" "vocal4local_tg" {
   }
 }
 
-resource "aws_lb_listener" "http_redirect_listener" {
+resource "aws_lb_listener" "http_listener" {
   load_balancer_arn = aws_lb.alb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
+    type             = var.enable_alb_https ? "redirect" : "forward"
+    target_group_arn = var.enable_alb_https ? null : aws_lb_target_group.vocal4local_tg.arn
 
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    dynamic "redirect" {
+      for_each = var.enable_alb_https ? [1] : []
+      content {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
     }
   }
 }
 
 resource "aws_lb_listener" "https_listener" {
+  count             = var.enable_alb_https ? 1 : 0
   load_balancer_arn = aws_lb.alb.arn
   port              = "443"
   protocol          = "HTTPS"

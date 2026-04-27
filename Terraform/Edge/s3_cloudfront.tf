@@ -72,12 +72,13 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
     }
   }
 
-  aliases = [var.frontend_domain_name]
+  aliases = var.enable_custom_domain ? [var.frontend_domain_name] : []
 
   viewer_certificate {
-    acm_certificate_arn      = var.cloudfront_acm_certificate_arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    cloudfront_default_certificate = !var.enable_custom_domain
+    acm_certificate_arn            = var.enable_custom_domain ? var.cloudfront_acm_certificate_arn : null
+    ssl_support_method             = var.enable_custom_domain ? "sni-only" : null
+    minimum_protocol_version       = var.enable_custom_domain ? "TLSv1.2_2021" : "TLSv1"
   }
 }
 

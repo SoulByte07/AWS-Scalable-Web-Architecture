@@ -15,6 +15,7 @@ module "compute" {
   private_subnet_ids      = module.networking.private_subnet_ids
   public_subnets          = module.networking.public_subnet_ids
   alb_security_group_id   = module.security.alb_strict_sg_id
+  enable_alb_https        = var.enable_alb_https
   alb_acm_certificate_arn = var.alb_acm_certificate_arn
   bucket_name_prefix      = var.bucket_name_prefix
 }
@@ -29,6 +30,7 @@ module "edge" {
   source = "./Edge"
 
   bucket_name_prefix             = var.bucket_name_prefix
+  enable_custom_domain           = var.enable_custom_domain
   frontend_domain_name           = var.frontend_domain_name
   cloudfront_acm_certificate_arn = var.cloudfront_acm_certificate_arn
 

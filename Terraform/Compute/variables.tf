@@ -37,6 +37,13 @@ variable "public_subnets" {
 variable "alb_acm_certificate_arn" {
   description = "ACM certificate ARN for the ALB HTTPS listener"
   type        = string
+  default     = null
+}
+
+variable "enable_alb_https" {
+  description = "Enable HTTPS listener on ALB"
+  type        = bool
+  default     = false
 }
 
 variable "bucket_name_prefix" {
