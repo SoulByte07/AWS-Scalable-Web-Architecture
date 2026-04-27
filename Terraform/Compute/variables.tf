@@ -8,9 +8,16 @@ variable "instance_type" {
   default = "t2.micro"
 }
 
-variable "ami_id" {
-  type    = string
-  default = "ami-0c94855ba95c71c99"
+variable "ami_id_override" {
+  description = "Optional AMI ID override for EC2 instances"
+  type        = string
+  default     = ""
+}
+
+variable "ami_ssm_parameter" {
+  description = "SSM parameter path for the AMI used by EC2 instances"
+  type        = string
+  default     = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 }
 
 variable "private_subnet_ids" {
@@ -32,7 +39,7 @@ variable "alb_acm_certificate_arn" {
   type        = string
 }
 
-variable "aws_ami" {
-  type    = string
-  default = "ami-0c55b159cbfafe1f0" # Amazon Linux 2 Mumbai
+variable "bucket_name_prefix" {
+  description = "Prefix used to build unique S3 bucket names"
+  type        = string
 }
