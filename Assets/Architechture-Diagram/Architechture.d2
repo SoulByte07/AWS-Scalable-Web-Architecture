@@ -1,0 +1,215 @@
+Vocal4Local {
+  # Layout settings to control spacing and direction
+  direction: down
+
+  Mumbai Region {
+    label: "Mumbai Region"
+    shape: square
+    style: {
+      fill: transparent
+      stroke: "#00a3e0"
+      stroke-dash: 5
+    }
+
+    # Pre-VPC elements
+    User: { shape: person }
+    Security: {
+      shape: hexagon
+      label: "Security Hub"
+    }
+    # Route 53 with '53' on the shield
+    Route53: {
+      shape: hexagon
+      label: Route 53
+    }
+    # Orange lock with user icon for Cognito/WAF flow
+    CognitoWAF: {
+      shape: hexagon
+      label: "Cognito / WAF"
+    }
+    # Multi-colored CloudFront icon
+    CloudFront: {
+      shape: cloud
+    }
+    # A generic security layer shield without a number, feeding into the WAF/Cognito flow
+    Security_Shield: {
+      shape: hexagon
+      label: "Security Shield"
+    }
+
+    VPC: {
+      label: VPC
+      style: {
+        fill: transparent
+        stroke: purple
+      }
+
+      # VPC entry point, labeled and shaped like the diagram's gate
+      ALB (VPC Ingress): {
+        shape: rectangle
+        label: "VPC Ingress"
+      }
+      # A logical traffic splitter gate below the ALB
+      TrafficSplitter: {
+        shape: oval
+        label: ""
+        style: {
+          fill: "#ffffff"
+          stroke: "#d3d3d3"
+        }
+      }
+
+      Availability Zone 1: {
+        label: "Availability Zone 1"
+        style: {
+          fill: transparent
+          stroke: "#00a3e0"
+          stroke-dash: 5
+        }
+
+        Public subnet: {
+          style: {
+            fill: "#e0f2f1"
+            stroke: green
+            stroke-dash: 5
+            stroke-width: 2
+          }
+          # Generic ASG with server group icon
+          WebASG1: {
+            shape: rectangle
+            label: "Web Tier"
+          }
+        }
+
+        Private subnet: {
+          style: {
+            fill: "#e1f5fe"
+            stroke: cyan
+            stroke-dash: 5
+          }
+          # ASG inside Private subnet
+          AppASG1: {
+            shape: rectangle
+            label: "App Tier"
+          }
+          # Database inside Private subnet
+          SQLPrimary: {
+            shape: cylinder
+            label: "SQL primary (M)"
+          }
+        }
+      }
+
+      Availability Zone 2: {
+        label: "Availability Zone 2"
+        style: {
+          fill: transparent
+          stroke: "#00a3e0"
+          stroke-dash: 5
+        }
+
+        Public subnet: {
+          style: {
+            fill: "#e0f2f1"
+            stroke: green
+            stroke-dash: 5
+            stroke-width: 2
+          }
+          WebASG2: {
+            shape: rectangle
+            label: "Web Tier"
+          }
+        }
+
+        Private subnet: {
+          style: {
+            fill: "#e1f5fe"
+            stroke: cyan
+            stroke-dash: 5
+          }
+          AppASG2: {
+            shape: rectangle
+            label: "App Tier"
+          }
+          # Standby database inside Private subnet
+          DBStandby: {
+            shape: cylinder
+            label: "DB Instance standby (S)"
+          }
+          # Green S3 bucket inside Private Subnet 2
+          S3Bucket: {
+            shape: cylinder
+            label: S3
+          }
+        }
+      }
+
+      # Red dashed boxes (logical security groups)
+      VPC.AppTierSG1: {
+        style: {
+          stroke: "#ff0000"
+          stroke-dash: 5
+        }
+        AZ1.Private subnet.AppASG1
+        AZ1.Private subnet.SQLPrimary
+      }
+      VPC.AppTierSG2: {
+        style: {
+          stroke: "#ff0000"
+          stroke-dash: 5
+        }
+        AZ2.Private subnet.AppASG2
+        AZ2.Private subnet.DBStandby
+      }
+      VPC.DB_SG: {
+        style: {
+          stroke: "#ff0000"
+          stroke-dash: 5
+        }
+        AZ1.Private subnet.SQLPrimary
+        AZ2.Private subnet.DBStandby
+      }
+
+      # Main connections inside VPC
+      ALB (VPC Ingress) -> TrafficSplitter
+      TrafficSplitter -> Availability Zone 1.Public subnet.WebASG1
+      TrafficSplitter -> Availability Zone 2.Public subnet.WebASG2
+
+      Availability Zone 1.Public subnet.WebASG1 -> Availability Zone 1.Private subnet.AppASG1
+      Availability Zone 2.Public subnet.WebASG2 -> Availability Zone 2.Private subnet.AppASG2
+
+      Availability Zone 1.Private subnet.AppASG1 -> Availability Zone 1.Private subnet.SQLPrimary
+      Availability Zone 2.Private subnet.AppASG2 -> Availability Zone 2.Private subnet.DBStandby
+
+      # Synchronisation connection between databases
+      Availability Zone 1.Private subnet.SQLPrimary <-> Availability Zone 2.Private subnet.DBStandby: {
+        label: sync
+        style: { stroke-dash: 5 }
+      }
+
+      # Connection from private app tier in AZ1 to S3 in AZ2
+      Availability Zone 1.Private subnet.AppASG1 -> Availability Zone 2.Private subnet.S3Bucket
+    }
+
+    # External to VPC connections
+    User -> Route53
+    User -> Security_Shield
+    User -> CognitoWAF
+    Security_Shield -> CognitoWAF
+    CognitoWAF -> CloudFront
+    Route53 -> CloudFront
+    CloudFront -> VPC.ALB (VPC Ingress)
+
+    # Bottom-right support/logging elements
+    # Cloud with server rack icon
+    WorkSpaces: {
+      shape: cloud
+      label: WorkSpaces
+    }
+    # Cloud with magnifying glass icon
+    CloudWatch: {
+      shape: cloud
+      label: CloudWatch
+    }
+  }
+}

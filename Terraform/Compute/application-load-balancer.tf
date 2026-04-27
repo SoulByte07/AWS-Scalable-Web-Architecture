@@ -1,3 +1,5 @@
+# Internet-facing ALB in public subnets.
+# Access logs are enabled for visibility.
 resource "aws_lb" "alb" {
   name               = "alb"
   internal           = false
