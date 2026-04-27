@@ -53,10 +53,11 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
   }
 
   default_cache_behavior {
-    allowed_methods        = ["GET", "HEAD"]
-    cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = "S3-Vocal4Local-Frontend"
-    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods            = ["GET", "HEAD"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3-Vocal4Local-Frontend"
+    viewer_protocol_policy     = "redirect-to-https"
+    response_headers_policy_id = "67f7725c-6f97-4210-82d7-5512b31e9d03"
 
     forwarded_values {
       query_string = false
@@ -78,13 +79,36 @@ resource "aws_cloudfront_distribution" "vocal4local_cdn" {
     cloudfront_default_certificate = !var.enable_custom_domain
     acm_certificate_arn            = var.enable_custom_domain ? var.cloudfront_acm_certificate_arn : null
     ssl_support_method             = var.enable_custom_domain ? "sni-only" : null
-    minimum_protocol_version       = var.enable_custom_domain ? "TLSv1.2_2021" : "TLSv1"
+    minimum_protocol_version       = "TLSv1.2_2021"
   }
 }
 
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "vocal4local_frontend_policy" {
+  statement {
+    sid    = "DenyInsecureTransport"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = ["s3:*"]
+
+    resources = [
+      aws_s3_bucket.vocal4local_frontend.arn,
+      "${aws_s3_bucket.vocal4local_frontend.arn}/*"
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
   statement {
     sid    = "AllowCloudFrontReadOnly"
     effect = "Allow"
@@ -170,4 +194,62 @@ resource "aws_wafv2_web_acl" "cloudfront_acl" {
       sampled_requests_enabled   = true
     }
   }
+
+  rule {
+    name     = "AWSManagedRulesAmazonIpReputationList"
+    priority = 3
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesAmazonIpReputationList"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "aws-managed-ip-reputation"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "RateLimitPerIp"
+    priority = 4
+
+    action {
+      block {}
+    }
+
+    statement {
+      rate_based_statement {
+        aggregate_key_type = "IP"
+        limit              = 2000
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "rate-limit-per-ip"
+      sampled_requests_enabled   = true
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "cloudfront_waf" {
+  provider = aws.us_east_1
+
+  name              = "aws-waf-logs-vocal4local-cloudfront"
+  retention_in_days = 30
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "cloudfront_acl" {
+  provider = aws.us_east_1
+
+  resource_arn            = aws_wafv2_web_acl.cloudfront_acl.arn
+  log_destination_configs = [aws_cloudwatch_log_group.cloudfront_waf.arn]
 }
