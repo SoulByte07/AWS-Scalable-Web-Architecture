@@ -16,6 +16,7 @@ module "compute" {
   public_subnets          = module.networking.public_subnet_ids
   alb_security_group_id   = module.security.alb_strict_sg_id
   alb_acm_certificate_arn = var.alb_acm_certificate_arn
+  bucket_name_prefix      = var.bucket_name_prefix
 }
 
 module "database" {
@@ -26,6 +27,10 @@ module "database" {
 
 module "edge" {
   source = "./Edge"
+
+  bucket_name_prefix             = var.bucket_name_prefix
+  frontend_domain_name           = var.frontend_domain_name
+  cloudfront_acm_certificate_arn = var.cloudfront_acm_certificate_arn
 
   providers = {
     aws           = aws
