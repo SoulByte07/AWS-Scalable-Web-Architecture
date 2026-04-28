@@ -8,18 +8,14 @@
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_alb_acm_certificate_arn"></a> [alb\_acm\_certificate\_arn](#input\_alb\_acm\_certificate\_arn) | ACM certificate ARN for the ALB HTTPS listener | `string` | n/a | yes |
-| <a name="input_alb_security_group_id"></a> [alb\_security\_group\_id](#input\_alb\_security\_group\_id) | The Security Group ID of the ALB | `string` | n/a | yes |
-| <a name="input_ami_id"></a> [ami\_id](#input\_ami\_id) | n/a | `string` | `"ami-0c94855ba95c71c99"` | no |
-| <a name="input_availability_zones"></a> [availability\_zones](#input\_availability\_zones) | AZs for High Availability | `list(string)` | <pre>[<br/>  "ap-south-1a",<br/>  "ap-south-1b"<br/>]</pre> | no |
-| <a name="input_aws_ami"></a> [aws\_ami](#input\_aws\_ami) | n/a | `string` | `"ami-0c55b159cbfafe1f0"` | no |
-| <a name="input_create_elastic_ip"></a> [create\_elastic\_ip](#input\_create\_elastic\_ip) | n/a | `bool` | `true` | no |
-| <a name="input_db_security_group_id"></a> [db\_security\_group\_id](#input\_db\_security\_group\_id) | The Security Group ID for the RDS instance | `string` | n/a | yes |
-| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | n/a | `string` | `"t2.micro"` | no |
-| <a name="input_private_db_subnets"></a> [private\_db\_subnets](#input\_private\_db\_subnets) | List of Private Subnet IDs strictly for the database | `list(string)` | n/a | yes |
-| <a name="input_private_subnet_ids"></a> [private\_subnet\_ids](#input\_private\_subnet\_ids) | List of Private Subnet IDs for the ASG | `list(string)` | n/a | yes |
-| <a name="input_public_subnet_ids"></a> [public\_subnet\_ids](#input\_public\_subnet\_ids) | n/a | `list(string)` | n/a | yes |
-| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The ID of the VPC | `string` | n/a | yes |
+| <a name="input_alb_acm_certificate_arn"></a> [alb\_acm\_certificate\_arn](#input\_alb\_acm\_certificate\_arn) | ACM certificate ARN for the ALB HTTPS listener | `string` | `null` | no |
+| <a name="input_bucket_name_prefix"></a> [bucket\_name\_prefix](#input\_bucket\_name\_prefix) | Prefix used to build globally unique S3 bucket names | `string` | `"vocal4local"` | no |
+| <a name="input_cloudfront_acm_certificate_arn"></a> [cloudfront\_acm\_certificate\_arn](#input\_cloudfront\_acm\_certificate\_arn) | ACM certificate ARN in us-east-1 for CloudFront custom domain | `string` | `null` | no |
+| <a name="input_enable_alb_https"></a> [enable\_alb\_https](#input\_enable\_alb\_https) | Enable HTTPS listener on ALB | `bool` | `false` | no |
+| <a name="input_enable_custom_domain"></a> [enable\_custom\_domain](#input\_enable\_custom\_domain) | Enable Route53 record and CloudFront custom domain | `bool` | `false` | no |
+| <a name="input_frontend_domain_name"></a> [frontend\_domain\_name](#input\_frontend\_domain\_name) | CloudFront custom domain (for example app.example.com) | `string` | `null` | no |
+| <a name="input_ops_alert_email"></a> [ops\_alert\_email](#input\_ops\_alert\_email) | Optional email endpoint for operational alerts | `string` | `null` | no |
+| <a name="input_root_domain_name"></a> [root\_domain\_name](#input\_root\_domain\_name) | Route53 hosted zone domain name (for example example.com) | `string` | `null` | no |
 
 ## Outputs
 
