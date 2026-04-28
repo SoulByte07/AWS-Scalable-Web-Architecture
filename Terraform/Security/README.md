@@ -27,7 +27,26 @@ Flags:
       --output-check                check if content of output file is up to date (default false)
       --output-file string          file path to insert output into (default "")
       --output-mode string          output to file method [inject, replace] (default "inject")
-      --output-template string      output template (default "<!-- BEGIN_TF_DOCS -->\n{{ .Content }}\n<!-- END_TF_DOCS -->")
+      --output-template string      output template (default "<!-- BEGIN_TF_DOCS -->
+## Providers
+
+| Name | Version |
+| ---- | ------- |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The ID of the VPC where security groups will be created | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+| ---- | ----------- |
+| <a name="output_alb_strict_sg_id"></a> [alb\_strict\_sg\_id](#output\_alb\_strict\_sg\_id) | The ID of the security group for the Load Balancer |
+| <a name="output_db_sg_id"></a> [db\_sg\_id](#output\_db\_sg\_id) | This exports the ID so main.tf can see it and pass it to the Database |
+<!-- END_TF_DOCS -->")
       --output-values               inject output values into outputs (default false)
       --output-values-from string   inject output values from file into outputs (default "")
       --read-comments               use comments as description when description is empty (default true)
