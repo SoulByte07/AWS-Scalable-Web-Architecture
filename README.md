@@ -71,7 +71,7 @@ I applied the **Principle of Least Privilege** across the entire stack:
 * [x] Problem Analysis & Requirement Gathering
 * [x] Initial Architecture Design
 * [x] Security Group Policy Definition
-* [ ] **Next Step:** Convert this manual "ClickOps" design into **Terraform (Infrastructure as Code)** for 1-click deployment.
+* [x] **Next Step:** Convert this manual "ClickOps" design into **Terraform (Infrastructure as Code)** for 1-click deployment.
 
 ---
 
